@@ -1,0 +1,11 @@
+An implementation of the ["tablut"][wikipedia_tablut] game (with slightly
+simpler rules, e.g. no base camps). The original code is from a programming
+assignment. It has been heavily refactored and "ported" from c++ and conio.h to
+ANSI C and ncurses, but the original logic is pretty much intact
+(surprisingly).
+
+The compilation process is simple and the Makefile is self-explanatory. It
+should compile on any unix-like machine and the only external dependency is
+`ncurses`.
+
+[wikipedia_tablut]: https://en.wikipedia.org/wiki/Tafl_games#Tablut
