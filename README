@@ -1,2 +1,4 @@
 Code for assignments and exercises I did during college.  See each directory
 for details/demos/screenshots.
+
+- tablut: ANSI C / ncurses implementation of the game Tablut.
