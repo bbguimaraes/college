@@ -1,0 +1,16 @@
+A little assembly project from the computer architecture class. The program
+reads a three-digit number and "slides" it to the bottom of the column and then
+to an external three-digit seven-segments display. After that, it is multiplied
+by three and moved a column to the right. When the fourth column is done, the
+program ends.
+
+The procedure to display the number of the external display is implemented as
+an interruption. The cs:ip values are written to the interrupt vector table for
+the `6eh` interrupt, which is then called on the main loop. The display is
+programmed by writing the value `80h` to the `0303h` address.
+
+The main part of the program can be tested using dosbox. I didn't figure out if
+there's a way to test the external display part. To compile, link and execute
+the code using MASM:
+
+    $ dosbox run.bat

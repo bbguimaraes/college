@@ -1,4 +1,6 @@
 Code for assignments and exercises I did during college.  See each directory
 for details/demos/screenshots.
 
+- asm: simple assembly program that slides a three-digit number across the
+  terminal and an external seven-segment display.
 - tablut: ANSI C / ncurses implementation of the game Tablut.
