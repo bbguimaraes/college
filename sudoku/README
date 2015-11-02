@@ -1,0 +1,4 @@
+Sudoku solver using genetic algorithms. Provides two execution methods:
+
+- a simple interface that creates new generations until the solution is found
+- a detailed interface, where each generation is graphically displayed
