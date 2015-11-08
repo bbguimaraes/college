@@ -1,0 +1,62 @@
+Simulation of a memory management component. Allocates a region of memory and
+handles loading and unloading of processes, finding free positions using the
+best-fit algorithm.
+
+
+    $ ./mem_manager
+    >> defmem 64
+    >> d
+    0:  $$$$$$$$ $$$$$$$$ $$$$$$$$ $$$$$$$$
+    32: $$$$$$$$ $$$$$$$$ $$$$$$$$ $$$$$$$$
+    >> load 1 4 a
+    >> d
+    0:  aaaa$$$$ $$$$$$$$ $$$$$$$$ $$$$$$$$
+    32: $$$$$$$$ $$$$$$$$ $$$$$$$$ $$$$$$$$
+    >> load 2 16 b
+    >> d
+    0:  aaaabbbb bbbbbbbb bbbb$$$$ $$$$$$$$
+    32: $$$$$$$$ $$$$$$$$ $$$$$$$$ $$$$$$$$
+    >> load 3 4 c
+    >> d
+    0:  aaaabbbb bbbbbbbb bbbbcccc $$$$$$$$
+    32: $$$$$$$$ $$$$$$$$ $$$$$$$$ $$$$$$$$
+    >> load 4 8 d
+    >> d
+    0:  aaaabbbb bbbbbbbb bbbbcccc dddddddd
+    32: $$$$$$$$ $$$$$$$$ $$$$$$$$ $$$$$$$$
+    >> load 5 4 e
+    >> d
+    0:  aaaabbbb bbbbbbbb bbbbcccc dddddddd
+    32: eeee$$$$ $$$$$$$$ $$$$$$$$ $$$$$$$$
+    >> load 6 4 f
+    >> d
+    0:  aaaabbbb bbbbbbbb bbbbcccc dddddddd
+    32: eeeeffff $$$$$$$$ $$$$$$$$ $$$$$$$$
+    >> load 7 4 g
+    >> d
+    0:  aaaabbbb bbbbbbbb bbbbcccc dddddddd
+    32: eeeeffff gggg$$$$ $$$$$$$$ $$$$$$$$
+    >> del 2
+    >> d
+    0:  aaaa$$$$ $$$$$$$$ $$$$cccc dddddddd
+    32: eeeeffff gggg$$$$ $$$$$$$$ $$$$$$$$
+    >> load 2 4 b
+    >> d
+    0:  aaaabbbb $$$$$$$$ $$$$cccc dddddddd
+    32: eeeeffff gggg$$$$ $$$$$$$$ $$$$$$$$
+    >> del 4
+    >> d
+    0:  aaaabbbb $$$$$$$$ $$$$cccc $$$$$$$$
+    32: eeeeffff gggg$$$$ $$$$$$$$ $$$$$$$$
+    >> del 6
+    >> d
+    0:  aaaabbbb $$$$$$$$ $$$$cccc $$$$$$$$
+    32: eeee$$$$ gggg$$$$ $$$$$$$$ $$$$$$$$
+    >> load 2 4 b
+    >> d
+    0:  aaaabbbb $$$$$$$$ $$$$cccc $$$$$$$$
+    32: eeeebbbb gggg$$$$ $$$$$$$$ $$$$$$$$
+    >> compact
+    >> d
+    0:  aaaabbbb cccceeee bbbbgggg $$$$$$$$
+    32: $$$$$$$$ $$$$$$$$ $$$$$$$$ $$$$$$$$
