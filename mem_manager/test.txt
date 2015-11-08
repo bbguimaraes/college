@@ -1,0 +1,28 @@
+defmem 64
+d
+load 1 4 a
+d
+load 2 16 b
+d
+load 3 4 c
+d
+load 4 8 d
+d
+load 5 4 e
+d
+load 6 4 f
+d
+load 7 4 g
+d
+del 2
+d
+load 2 4 b
+d
+del 4
+d
+del 6
+d
+load 2 4 b
+d
+compact
+d
