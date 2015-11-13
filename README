@@ -3,6 +3,8 @@ for details/demos/screenshots.
 
 - asm: simple assembly program that slides a three-digit number across the
   terminal and an external seven-segment display.
+- image_proc: graphical image processing utility with histograms, equalization,
+  and filtering.
 - mem_manager: best-fit memory allocator simluation.
 - nqueens: n-queens solver and graphical display.
 - sudoku: Sudoku solver library/GUI using genetic algorithms.

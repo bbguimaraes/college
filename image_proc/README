@@ -1,0 +1,11 @@
+Image processing utility. Displays images and their histograms and has options
+for equalization and filtering (mean and configurable weight).
+
+
+# Compilation
+
+The Qt toolkit and opengl are used for the GUI and the compilation can be done
+using qmake:
+
+    $ qmake
+    $ make
