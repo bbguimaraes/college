@@ -1,0 +1,170 @@
+A simulation of a lock-based database, where transactions act on shared data.
+Each transaction is a sequence of read or write operations on named variables,
+and ends with either a commit or abort operation.
+
+A transaction executing a read operation tries to acquire a shared lock on the
+variable and, likewise, a transaction executing a write operation tries to
+acquire an exclusive lock on the variable.  An existing exclusive lock blocks
+any attempt to acquire any type of lock.  An existing shared lock blocks any
+attempt to acquire an exclusive lock.  If a transaction can't acquire the lock
+it needs, it sleeps until the lock is released.  That occurs when the
+transaction holding the lock executes a commit or abort.
+
+# Compilation
+
+The core engine that drives the simulation is built as a library (the `lib`
+directory) and has no external dependencies.  The GUI is done using Qt.  Both
+use qmake for compilation:
+
+    $ qmake
+    $ make
+
+
+# Interface
+
+The simulation state is represented on a GUI.  Execution plans can be entered
+using the text field on the "create transaction" section by either indicating a
+file name or writing the operation list directly.  The format (in shell syntax)
+is a whitespace-separated list of:
+
+    ${name}.${op}${var}
+
+where `${name}` is the name of the transaction, `${op}` is a single character
+representing the operation ('r', 'w', 'c', 'a') and `${var}` is the name of the
+variable.  An example valid input is:
+
+    t1.ra t2.rb t2.wa t1.wb t1.c t2.a
+
+Random lists of operations can be generated on the "random" section.
+
+The "actions" panel can be used to step through the execution, to reset the
+execution to the initial state and to clear the list of transactions.  During
+the execution, the main region displays information about the operations and
+transactions and the "locks" region displays the locked variables, locks and
+sleeping transactions.
+
+
+# Testing
+
+The `tests` directory has a script for testing the library without using the
+graphical interface.  If executed without arguments, it runs a pre-generated
+test and makes sure the output is the (also pre-generated) expected.  It can
+also be passed a file name as argument.  In that case, the file contents are
+parsed and the simulation is executed while output similar to the "locks"
+region of the GUI is written on the standard output:
+
+    $ cat tests/t
+    t1.wa t1.wb t1.wb t1.c
+    t2.wa t2.wb t2.c
+    t3.wa t3.wb t3.a
+    $ ./transactions tests/t
+    === locked   ===
+    === locks    ===
+    === sleeping ===
+
+    t2.wa
+
+    === locked   ===
+    a: -1
+    === locks    ===
+    a: t2
+    === sleeping ===
+
+    t2.wb
+
+    === locked   ===
+    a: -1
+    b: -1
+    === locks    ===
+    a: t2
+    b: t2
+    === sleeping ===
+
+    t1.wa
+
+    === locked   ===
+    a: -1
+    b: -1
+    === locks    ===
+    a: t2
+    b: t2
+    === sleeping ===
+    a: t1
+
+    t2.c
+
+    === locked   ===
+    === locks    ===
+    === sleeping ===
+
+    t1.wa
+
+    === locked   ===
+    a: -1
+    === locks    ===
+    a: t1
+    === sleeping ===
+
+    t3.wa
+
+    === locked   ===
+    a: -1
+    === locks    ===
+    a: t1
+    === sleeping ===
+    a: t3
+
+    t1.wb
+
+    === locked   ===
+    a: -1
+    b: -1
+    === locks    ===
+    a: t1
+    b: t1
+    === sleeping ===
+    a: t3
+
+    t1.wb
+
+    === locked   ===
+    a: -1
+    b: -1
+    === locks    ===
+    a: t1
+    b: t1
+    === sleeping ===
+    a: t3
+
+    t1.c
+
+    === locked   ===
+    === locks    ===
+    === sleeping ===
+
+    t3.wa
+
+    === locked   ===
+    a: -1
+    === locks    ===
+    a: t3
+    === sleeping ===
+
+    t3.wb
+
+    === locked   ===
+    a: -1
+    b: -1
+    === locks    ===
+    a: t3
+    b: t3
+    === sleeping ===
+
+    t3.a
+
+    === locked   ===
+    === locks    ===
+    === sleeping ===
+    === locked   ===
+    === locks    ===
+    === sleeping ===

@@ -1,0 +1,110 @@
+=== locked   ===
+=== locks    ===
+=== sleeping ===
+
+t2.wa
+
+=== locked   ===
+a: -1
+=== locks    ===
+a: t2
+=== sleeping ===
+
+t2.wb
+
+=== locked   ===
+a: -1
+b: -1
+=== locks    ===
+a: t2
+b: t2
+=== sleeping ===
+
+t1.wa
+
+=== locked   ===
+a: -1
+b: -1
+=== locks    ===
+a: t2
+b: t2
+=== sleeping ===
+a: t1
+
+t2.c
+
+=== locked   ===
+=== locks    ===
+=== sleeping ===
+
+t1.wa
+
+=== locked   ===
+a: -1
+=== locks    ===
+a: t1
+=== sleeping ===
+
+t3.wa
+
+=== locked   ===
+a: -1
+=== locks    ===
+a: t1
+=== sleeping ===
+a: t3
+
+t1.wb
+
+=== locked   ===
+a: -1
+b: -1
+=== locks    ===
+a: t1
+b: t1
+=== sleeping ===
+a: t3
+
+t1.wb
+
+=== locked   ===
+a: -1
+b: -1
+=== locks    ===
+a: t1
+b: t1
+=== sleeping ===
+a: t3
+
+t1.c
+
+=== locked   ===
+=== locks    ===
+=== sleeping ===
+
+t3.wa
+
+=== locked   ===
+a: -1
+=== locks    ===
+a: t3
+=== sleeping ===
+
+t3.wb
+
+=== locked   ===
+a: -1
+b: -1
+=== locks    ===
+a: t3
+b: t3
+=== sleeping ===
+
+t3.a
+
+=== locked   ===
+=== locks    ===
+=== sleeping ===
+=== locked   ===
+=== locks    ===
+=== sleeping ===

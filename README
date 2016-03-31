@@ -11,3 +11,4 @@ for details/demos/screenshots.
   with graphics and network communication.
 - sudoku: Sudoku solver library/GUI using genetic algorithms.
 - tablut: ANSI C / ncurses implementation of the game Tablut.
+- transactions: two-phase locking (2PL) simulation TUI/GUI.
