@@ -7,5 +7,7 @@ for details/demos/screenshots.
   and filtering.
 - mem_manager: best-fit memory allocator simluation.
 - nqueens: n-queens solver and graphical display.
+- sockets: an implementation of the game Jungle ("Dou Shou Qi", in Chinese)
+  with graphics and network communication.
 - sudoku: Sudoku solver library/GUI using genetic algorithms.
 - tablut: ANSI C / ncurses implementation of the game Tablut.

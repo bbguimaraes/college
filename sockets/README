@@ -1,0 +1,53 @@
+An implementation of the game [Jungle ("Dou Shou Qi", in Chinese)](jungle) that
+uses sockets for communication.
+
+[jungle]: https://en.wikipedia.org/wiki/Jungle_%28board_game%29
+
+
+# Compilation
+
+The GUI is done using the qt toolkit and opengl.  Standard unix sockets are
+used for the communication.  After installing qt, execute:
+
+    $ qmake
+    $ make
+
+
+# Running
+
+The generated binary is both a client and a server.  The only difference is the
+server must be running before the client tries to make a connection.
+Additionally, the server always gets the first move.
+
+The program can be executed in two ways: with no arguments, a little GUI window
+is used to configure the player name and the server address/port (for listening
+or for connecting).  These arguments can also be provided as arguments to the
+program.  In that case, the configuration window is not displayed.
+
+    $ ./sockets billy &
+    $ ./sockets bob 127.0.0.1 &
+    & wait
+
+
+# Communication
+
+The protocol is really simple, and consists of an initial value indicating the
+type of message followed by the message value.  This value can be a "quit",
+indicating the other player has left the game, or either a "movement" or
+"victory" message.  These two last types are followed by the movement from the
+other player.
+
+There are very few checks made on the communication channel, so a malicious
+player can do almost anything: move the other player's characters, crashing the
+game, etc.
+
+
+# Testing
+
+The `test` directory contains some scripts that are useful for testing.  The
+file `test/single.c` can be compiled into a program that will try to connect on
+`127.0.0.1:8000` and will loop moving its rat between its original spot and the
+spot next to it.
+
+It also has some options to run both a client and a server on the same
+terminal, with the possibility to run one of them in gdb.
