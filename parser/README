@@ -1,0 +1,29 @@
+A top-down parser for a made-up programming language.  See `grammar.txt`.
+
+
+# Compilation
+
+No external dependencies, use qmake for compilation:
+
+    $ qmake
+    $ make
+
+
+# Execution
+
+The program reads the input from a file if a file name is passed as argument or
+from standard input.  The input is parsed and any errors are reported on the
+standard error stream.  There is also a "lexer debug mode", using the `--lexer`
+flag, that output each token as understood by the lexer:
+
+    $ ./parser tests/code.txt
+    $ echo $?
+    0
+    $ tac tests/code.txt | ./parser
+    1: expected TK_ALGORITMO, found fimalgoritmo(TK_FIM_ALG)
+    $ ./parser --lexer tests/code.txt | head -5
+    Token[0x7ffdeafcee50]: text(algoritmo), type(TK_ALGORITMO)
+    Token[0x7ffdeafcee80]: text("billy_bill"), type(TK_STRING)
+    Token[0x7ffdeafcee80]: text(funcao), type(TK_FUNCAO)
+    Token[0x7ffdeafcee80]: text(a), type(TK_IDENT)
+    Token[0x7ffdeafcee80]: text((), type(TK_ABRE_PAR)

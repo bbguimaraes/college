@@ -1,0 +1,40 @@
+algoritmo "billy_bill"
+
+funcao a(a: inteiro; c: real): inteiro
+var
+    an_ident, t: inteiro
+inicio
+    t <- 1
+    para an_ident de 1 ate a faca
+        t <- t mod a
+    fimpara
+    retorne a
+fimfuncao
+
+var
+    a: inteiro
+    b, c: real
+    d, f, g: logico
+    h, i, j, k: literal
+    l, m, n, o, p: vetor [1 .. 5] de inteiro
+    q, r, s, t, u, v: vetor [1 .. 5, 1 .. 5] de real
+
+inicio
+    se (b < 5 e a ou 5 < 4) entao
+        a <- b
+    senao
+        a <- c
+    fimse
+
+    para a de b ate c faca
+        a()
+    fimpara
+
+    repita
+        a()
+    ate a
+
+    enquanto a faca
+        a()
+    fimenquanto
+fimalgoritmo
