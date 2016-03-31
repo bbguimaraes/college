@@ -1,0 +1,62 @@
+<algoritmo>	::= "algoritmo" <nome> <fdec> <var> "inicio" <com> "fimalgoritmo"
+<nome>    	::= <string> | ""
+
+<fdec>		::= "funcao" <func> <fdec> | "procedimento" <proc> <fdec> | ""
+<func>		::= <ident> "(" <paramd> ")" ":" <tipo> <var> "inicio" <com> "fimfuncao"
+<proc>		::= <ident> "(" <paramd> ")" <var> "inicio" <com> "fimprocedimento"
+<paramd>	::= <dec> <paramdl> | ""
+<paramdl>	::= ";" <dec> <paramdl> | ""
+
+<var>		::= "var" <ldec> | ""
+<ldec>		::= <dec> <ldec>| ""
+<dec>		::= <ident> <lid> ":" <tipo> | ""
+<lid>		::= "," <ident> <lid> | ""
+
+<tipo>		::= <tiposimp> | <tipov>
+<tiposimp>	::= "inteiro" | "real" | "logico" | "literal"
+<tipov>		::= "vetor" <vdec>
+<vdec>		::= "[" <cint> ".." <cint> <matriz> "]" "de" <tiposimp>
+<matriz>	::= "," <cint> ".." <cint> | ""
+
+<com>		::= <id> <atribfunc> <com>		|
+				"se" <se> <com>				|
+				"para" <para> <com>			|
+				"repita" <repita> <com>		|
+				"enquanto" <enquanto> <com>	|
+				"leia" <leia> <com>			|
+				"escreva" <escreva> <com>	|
+				"escreval" <escreva> <com>	|
+				"retorne" <exp>
+
+<atribfunc>	::= "<-" <exp> | "(" <ldec> ")"
+
+<se>		::= <exp> "entao" <com> <senao> "fimse"
+<senao>		::= <com> "fimse" | ""
+
+<para>		::= <ident> "de" <exp> "ate" <exp> "faca" <com> "fimpara"
+
+<repita>	::= <com> "ate" <exp>
+
+<enquanto>	::= <exp> "faca" <com> "fimenquanto"
+
+<leia>		::= "(" <ident> ")"
+<escreva>	::= "(" <exp> ")"
+
+<exp>		::= <expou>
+<expou>		::= <expe> <ou>
+<ou>		::= "ou" <expou> | ""
+<expe>		::= <exprel> <e>
+<e>			::= "e" <expe> | ""
+<exprel>	::= <expmais> <rel>
+<rel>		::= "=" <exprel> | "<>" <exprel> | ">" <exprel> | "<" <exprel> | ">=" <exprel> | "<=" <exprel> | ""
+<expmais>	::= <expmul> <mais>
+<mais>		::= "+" <expmais> | "-" <expmais> | ""
+<expmul>	::= <exppot> <mul>
+<mul>		::= "*" <expmul> | "/" <expmul> | "mod" <expmul> | "div" <expmul> | ""
+<exppot>	::= <t> <pot>
+<pot>		::= "^" <exppot> | ""
+<t>			::= <id> | "-" <t> | <cint> | <creal> | "verdadeiro" | "falso" | <string> | "(" <exp> ")"
+
+<id>        ::= <ident> <subs>
+<subs>      ::= "[" <exp> <subsmat> "]" | ""
+<subsmat>   ::= "," <exp> | ""

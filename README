@@ -7,6 +7,7 @@ for details/demos/screenshots.
   and filtering.
 - mem_manager: best-fit memory allocator simluation.
 - nqueens: n-queens solver and graphical display.
+- parser: a top-down parser for a made-up programming language.
 - sockets: an implementation of the game Jungle ("Dou Shou Qi", in Chinese)
   with graphics and network communication.
 - sudoku: Sudoku solver library/GUI using genetic algorithms.
