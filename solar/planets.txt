@@ -1,0 +1,79 @@
+# number of planets
+# for each planet:
+# - name
+# - texture file name
+# - distance (in astronomical units: the average earth-to-sun distance)
+# - speed (in days)
+# - radius (relative to the radius of the earth)
+# - star (boolean)
+10
+
+Sun
+img/sun.png
+0
+0
+109
+1
+
+Mercury
+img/mercury.jpg
+0.4
+87.9691
+0.3829
+0
+
+Venus
+img/venus.jpg
+0.7
+224.70069
+0.9499
+0
+
+Earth
+img/earth.jpg
+1
+365.256363004
+1
+0
+
+Moon
+img/moon.jpg
+1
+365.256363004
+0.1
+0
+
+Mars
+img/mars.jpg
+1.5
+686.971
+0.533
+0
+
+Jupiter
+img/jupiter.jpg
+5.2
+4332.59
+11.209
+0
+
+Saturn
+img/saturn.jpg
+9.5
+10759.22
+9.4492
+0
+
+Uranus
+img/uranus.jpg
+19.6
+30799.095
+4.007
+0
+
+Neptune
+img/neptune.jpg
+30
+60190.03
+3.883
+0

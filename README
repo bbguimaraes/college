@@ -10,6 +10,8 @@ for details/demos/screenshots.
 - parser: a top-down parser for a made-up programming language.
 - sockets: an implementation of the game Jungle ("Dou Shou Qi", in Chinese)
   with graphics and network communication.
+- solar: graphical simulation of the solar system with embedded internet
+  searches.
 - sudoku: Sudoku solver library/GUI using genetic algorithms.
 - tablut: ANSI C / ncurses implementation of the game Tablut.
 - transactions: two-phase locking (2PL) simulation TUI/GUI.
