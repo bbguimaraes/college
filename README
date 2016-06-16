@@ -8,6 +8,7 @@ for details/demos/screenshots.
 - mem_manager: best-fit memory allocator simluation.
 - nqueens: n-queens solver and graphical display.
 - parser: a top-down parser for a made-up programming language.
+- sms: spring-mass system simulation library/GUI.
 - sockets: an implementation of the game Jungle ("Dou Shou Qi", in Chinese)
   with graphics and network communication.
 - solar: graphical simulation of the solar system with embedded internet
