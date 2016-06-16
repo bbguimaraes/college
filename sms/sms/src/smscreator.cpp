@@ -57,25 +57,24 @@ void SMSCreator::create_string(
         DIRECTION.magnitude() / static_cast<float>(n_masses - 1);
     const auto INCREMENT_VECTOR = DIRECTION.normalized() * SPRING_LENGTH;
     const auto EACH_MASS = total_mass / n_masses;
-    auto masses = std::vector<Mass *>(n_masses, nullptr);
-    auto springs = std::vector<Spring *>(n_masses - 1, nullptr);
+    auto masses = std::vector<Mass>(n_masses);
+    auto springs = std::vector<Spring>(n_masses - 1);
     for(unsigned int i = 0; i < n_masses; ++i) {
-        auto mass = masses[i] = new Mass;
-        mass->set_mass(EACH_MASS);
-        mass->set_position(begin + (INCREMENT_VECTOR * static_cast<float>(i)));
+        auto & mass = masses[i];
+        mass.set_mass(EACH_MASS);
+        mass.set_position(begin + (INCREMENT_VECTOR * static_cast<float>(i)));
     }
-    for(unsigned int i = 0; i < n_masses - 1; ++i) {
-        auto spring = springs[i] = new Spring;
-        spring->set_k(k);
-        spring->set_eq_length(SPRING_LENGTH);
+    for(auto & spring : springs) {
+        spring.set_k(k);
+        spring.set_eq_length(SPRING_LENGTH);
     }
-    auto m0_it = std::begin(masses);
-    auto m1_it = ++std::begin(masses);
-    auto s_it = std::begin(springs);
-    while(m1_it != std::end(masses))
-        SpringMassSystem::link(*m0_it++, *m1_it++, *s_it++);
     system->set_masses(masses);
     system->set_springs(springs);
+    auto m0_it = std::begin(*system->masses());
+    auto m1_it = ++std::begin(*system->masses());
+    auto s_it = std::begin(*system->springs());
+    while(m1_it != std::end(*system->masses()))
+        SpringMassSystem::link(&(*m0_it++), &(*m1_it++), &(*s_it++));
 }
 
 /*static*/
@@ -94,50 +93,41 @@ void SMSCreator::create_flag(
     const float EACH_MASS = total_mass / N_MASSES;
     const unsigned int N_SPRINGS =
         x_masses * (y_masses - 1) + y_masses * (x_masses - 1);
-    auto masses = std::vector<Mass *>(N_MASSES);
-    auto springs = std::vector<Spring *>(N_SPRINGS);
-    for(unsigned int i = 0; i < N_MASSES; ++i)
-    for(unsigned int i = 0; i < N_SPRINGS; ++i) {
-        auto spring  = springs[i] = new Spring;
-        spring->set_k(k);
-    }
+    auto masses = std::vector<Mass>(N_MASSES);
+    auto springs = std::vector<Spring>(N_SPRINGS);
+    for(auto & spring : springs)
+        spring.set_k(k);
     for(unsigned int y = 0; y < y_masses; ++y) {
         for(unsigned int x = 0; x < x_masses; ++x) {
-            auto mass = masses[index(x, y)] = new Mass;
-            mass->set_mass(EACH_MASS);
-            mass->set_position(
+            auto & mass = masses[index(x, y)];
+            mass.set_mass(EACH_MASS);
+            mass.set_position(
                 begin + Vector(x * INCREMENT.x(), y * INCREMENT.y()));
         }
     }
-    auto spring_it = std::begin(springs);
-    for(unsigned int y = 0; y < y_masses - 1; ++y) {
-        for(unsigned int x = 0; x < x_masses - 1; ++x) {
-            (*spring_it)->set_eq_length(std::abs(INCREMENT.x()));
-            SpringMassSystem::link(
-                masses[index(x    , y)],
-                masses[index(x + 1, y)],
-                *spring_it++);
-            (*spring_it)->set_eq_length(std::abs(INCREMENT.y()));
-            SpringMassSystem::link(
-                masses[index(x, y    )],
-                masses[index(x, y + 1)],
-                *spring_it++);
-        }
-        (*spring_it)->set_eq_length(std::abs(INCREMENT.y()));
-        SpringMassSystem::link(
-            masses[index(x_masses - 1, y)],
-            masses[index(x_masses - 1, y + 1)],
-            *spring_it++);
-    }
-    for(unsigned int x = 0; x < x_masses - 1; ++x) {
-        (*spring_it)->set_eq_length(std::abs(INCREMENT.x()));
-        SpringMassSystem::link(
-            masses[index(x    , y_masses - 1)],
-            masses[index(x + 1, y_masses - 1)],
-            *spring_it++);
-    }
     system->set_masses(masses);
     system->set_springs(springs);
+    auto spring_it = std::begin(*system->springs());
+    auto link = [system, index, &spring_it](\
+            unsigned int x0, unsigned int y0,
+            unsigned int x1, unsigned int y1,
+            float eq_length) {
+        spring_it->set_eq_length(std::abs(eq_length));
+        SpringMassSystem::link(
+            &(*system->masses())[index(x0, y0)],
+            &(*system->masses())[index(x1, y1)],
+            &(*spring_it));
+        ++spring_it;
+    };
+    for(unsigned int y = 0; y < y_masses - 1; ++y) {
+        for(unsigned int x = 0; x < x_masses - 1; ++x) {
+            link(x, y, x + 1, y    , INCREMENT.x());
+            link(x, y, x    , y + 1, INCREMENT.y());
+        }
+        link(x_masses - 1, y, x_masses - 1, y + 1, INCREMENT.y());
+    }
+    for(unsigned int x = 0; x < x_masses - 1; ++x)
+        link(x, y_masses - 1, x + 1, y_masses - 1, INCREMENT.x());
 }
 
 void SMSCreator::create_crossed_flag(
@@ -157,31 +147,31 @@ void SMSCreator::create_crossed_flag(
     const unsigned int N_SPRINGS =
         (x_masses * (y_masses - 1) + y_masses * (x_masses - 1))
         + (2 * (x_masses - 1) * (y_masses - 1));
-    auto masses = std::vector<Mass *>(N_MASSES);
-    auto springs = std::vector<Spring *>(N_SPRINGS);
-    for(unsigned int i = 0; i < N_MASSES; ++i)
-    for(unsigned int i = 0; i < N_SPRINGS; ++i) {
-        auto spring  = springs[i] = new Spring;
-        spring->set_k(k);
-    }
+    auto masses = std::vector<Mass>(N_MASSES);
+    auto springs = std::vector<Spring>(N_SPRINGS);
     for(unsigned int y = 0; y < y_masses; ++y) {
         for(unsigned int x = 0; x < x_masses; ++x) {
-            auto mass = masses[index(x, y)] = new Mass;
-            mass->set_mass(EACH_MASS);
-            mass->set_position(
+            auto & mass = masses[index(x, y)];
+            mass.set_mass(EACH_MASS);
+            mass.set_position(
                 begin + Vector(x * INCREMENT.x(), y * INCREMENT.y()));
         }
     }
-    auto spring_it = std::begin(springs);
-    auto link = [masses, index, &spring_it](\
+    for(auto & spring : springs)
+        spring.set_k(k);
+    system->set_masses(masses);
+    system->set_springs(springs);
+    auto spring_it = std::begin(*system->springs());
+    auto link = [system, index, &spring_it](\
             unsigned int x0, unsigned int y0,
             unsigned int x1, unsigned int y1,
             float eq_length) {
-        (*spring_it)->set_eq_length(std::abs(eq_length));
+        spring_it->set_eq_length(std::abs(eq_length));
         SpringMassSystem::link(
-            masses[index(x0, y0)],
-            masses[index(x1, y1)],
-            *spring_it++);
+            &(*system->masses())[index(x0, y0)],
+            &(*system->masses())[index(x1, y1)],
+            &(*spring_it));
+        ++spring_it;
     };
     for(unsigned int y = 0; y < y_masses - 1; ++y) {
         for(unsigned int x = 0; x < x_masses - 1; ++x) {
@@ -192,13 +182,6 @@ void SMSCreator::create_crossed_flag(
         }
         link(x_masses - 1, y, x_masses - 1, y + 1, INCREMENT.y());
     }
-    for(unsigned int x = 0; x < x_masses - 1; ++x) {
-        (*spring_it)->set_eq_length(std::abs(INCREMENT.x()));
-        SpringMassSystem::link(
-            masses[index(x    , y_masses - 1)],
-            masses[index(x + 1, y_masses - 1)],
-            *spring_it++);
-    }
-    system->set_masses(masses);
-    system->set_springs(springs);
+    for(unsigned int x = 0; x < x_masses - 1; ++x)
+        link(x, y_masses - 1, x + 1, y_masses - 1, INCREMENT.x());
 }

@@ -104,7 +104,7 @@ void Display::select(Vector click) {
         glPushName(0);
         this->draw_masses(system, GL_SELECT);
         if(glRenderMode(GL_RENDER) != 0) {
-            selected = (*system->masses())[select_buffer[3]];
+            selected = &(*system->masses())[select_buffer[3]];
             break;
         }
     }
@@ -189,14 +189,14 @@ void Display::draw_system(SpringMassSystem * system) {
         this->draw_masses(system, GL_RENDER);
 }
 
-void Display::draw_springs_non_textured(SpringMassSystem * system) {
+void Display::draw_springs_non_textured(const SpringMassSystem * system) {
     glPushAttrib(GL_CURRENT_BIT | GL_LINE_BIT);
     glLineWidth(5.0f);
     glColor3f(0.0f, 1.0f, 0.0f);
     glBegin(GL_LINES);
-    for(auto spring : *system->springs()) {
-        auto p0 = spring->mass0()->position();
-        auto p1 = spring->mass1()->position();
+    for(auto & spring : *system->springs()) {
+        auto p0 = spring.mass0()->position();
+        auto p1 = spring.mass1()->position();
         glVertex3f(p0.x(), p0.y(), p0.z());
         glVertex3f(p1.x(), p1.y(), p1.z());
     }
@@ -211,7 +211,7 @@ void Display::draw_springs_textured(SpringMassSystem * system) {
     const float WIDTH_F = static_cast<float>(WIDTH);
     auto point = [WIDTH, WIDTH_F, masses](int x, int y) {
         glTexCoord2f(x / WIDTH_F, y / WIDTH_F);;
-        auto p = (*masses)[y * WIDTH + x]->position();
+        auto p = (*masses)[y * WIDTH + x].position();
         glVertex3f(p.x(), p.y(), p.z());;
     };
     glEnable(GL_TEXTURE_2D);
@@ -233,23 +233,23 @@ void Display::draw_springs_textured(SpringMassSystem * system) {
     glDisable(GL_TEXTURE_2D);
 }
 
-void Display::draw_masses(SpringMassSystem * system, GLenum mode) {
+void Display::draw_masses(const SpringMassSystem * system, GLenum mode) {
     if(!this->m_quadric)
         this->m_quadric = gluNewQuadric();
     glPushAttrib(GL_CURRENT_BIT);
     unsigned int index = 0;
-    for(auto mass : *system->masses()) {
+    for(auto & mass : *system->masses()) {
         if(mode == GL_SELECT)
             glLoadName(index++);
         glPushMatrix();
-        if(mass == this->m_selected)
+        if(&mass == this->m_selected)
             glColor3f(1.0f, 0.0f, 0.0f);
         else
             glColor3f(0.0f, 0.0f, 0.0f);
         glTranslatef(
-            mass->position().x(),
-            mass->position().y(),
-            mass->position().z());
+            mass.position().x(),
+            mass.position().y(),
+            mass.position().z());
         gluSphere(this->m_quadric, 0.1, 16, 16);
         glPopMatrix();
     }

@@ -27,6 +27,8 @@ class Spring {
         double eq_length() const {return this->m_eq_length;}
         Vector distance() const {return this->m_distance;}
         Vector force() const {return this->m_force;}
+        const Mass * mass0() const {return this->m_mass0;}
+        const Mass * mass1() const {return this->m_mass1;}
         Mass * mass0() {return this->m_mass0;}
         Mass * mass1() {return this->m_mass1;}
 
