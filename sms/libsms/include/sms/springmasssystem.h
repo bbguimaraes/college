@@ -23,8 +23,8 @@ class SpringMassSystem {
             {this->m_springs = s;}
         void set_gravity(const Vector & g) {this->m_gravity = g;}
 
-        const std::vector<Mass *> & masses() const {return this->m_masses;}
-        const std::vector<Spring *> & springs() const {return this->m_springs;}
+        const std::vector<Mass *> * masses() const {return &this->m_masses;}
+        const std::vector<Spring *> * springs() const {return &this->m_springs;}
         Vector gravity() const {return this->m_gravity;}
 
         static void link(Mass * mass0, Mass * mass1, Spring * spring);

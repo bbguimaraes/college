@@ -16,7 +16,7 @@ void SpringMassSystem::link(Mass * mass0, Mass * mass1, Spring * spring) {
 }
 
 void SpringMassSystem::update(float interval) {
-    for(auto mass : this->masses()) {
+    for(auto mass : *this->masses()) {
         if(mass->fixed())
             continue;
         Vector total_force = mass->force() + (this->m_gravity * mass->mass());
@@ -29,6 +29,6 @@ void SpringMassSystem::update(float interval) {
         mass->set_speed(speed);
         mass->set_position(mass->position() + speed * interval);
     }
-    for(auto spring : this->springs())
+    for(auto spring : *this->springs())
         spring->update_force();
 }

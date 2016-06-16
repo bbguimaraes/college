@@ -20,9 +20,9 @@ int main(int argc, char ** argv) {
     SpringMassSystem sms0, sms1;
     init_sm_system3(&sms0);
     init_sm_system3(&sms1);
-    for(auto mass : sms0.masses())
+    for(auto mass : *sms0.masses())
         mass->set_position(mass->position() + Vector(-10.0f));
-    for(auto mass : sms1.masses())
+    for(auto mass : *sms1.masses())
         mass->set_position(mass->position() + Vector(10.0f));
     Display display;
     display.makeCurrent();
@@ -60,7 +60,7 @@ void init_sm_system0(SpringMassSystem * system) {
         "# spring k constant\n"
         "0.25\n");
     SMSCreator::read_from_file(system, &input);
-    system->masses()[0]->set_fixed(true);
+    (*system->masses())[0]->set_fixed(true);
 }
 
 void init_sm_system1(SpringMassSystem * system) {
@@ -69,7 +69,7 @@ void init_sm_system1(SpringMassSystem * system) {
         Vector(),
         Vector(5.0f, 0.0f, 0.0f),
         10, 1, 1);
-    system->masses()[0]->set_fixed(true);
+    (*system->masses())[0]->set_fixed(true);
 }
 
 void init_sm_system2(SpringMassSystem * system) {
@@ -79,8 +79,8 @@ void init_sm_system2(SpringMassSystem * system) {
         Vector(-5.0f, 10.0f), Vector(5.0f, 0.0f),
         W, 5,
         1.0f, 10.0f);
-    system->masses()[0]->set_fixed(true);
-    system->masses()[W - 1]->set_fixed(true);
+    (*system->masses())[0]->set_fixed(true);
+    (*system->masses())[W - 1]->set_fixed(true);
 }
 
 void init_sm_system3(SpringMassSystem * system) {
@@ -90,8 +90,8 @@ void init_sm_system3(SpringMassSystem * system) {
         Vector(-5.0f, 10.0f), Vector(5.0f, 0.0f),
         W, 5,
         1.0f, 10.0f);
-    system->masses()[0]->set_fixed(true);
-    system->masses()[W - 1]->set_fixed(true);
+    (*system->masses())[0]->set_fixed(true);
+    (*system->masses())[W - 1]->set_fixed(true);
 }
 
 GLuint load_texture(const std::string & filename) {
