@@ -16,19 +16,21 @@ void SpringMassSystem::link(Mass * mass0, Mass * mass1, Spring * spring) {
 }
 
 void SpringMassSystem::update(float interval) {
-    for(auto mass : *this->masses()) {
-        if(mass->fixed())
+    // TODO positions are updated while forces are being calculated
+    // TODO avoid calculating forces twice (related? ^)
+    for(auto & spring : *this->springs())
+        spring.update_force();
+    for(auto & mass : *this->masses()) {
+        if(mass.fixed())
             continue;
-        Vector total_force = mass->force() + (this->m_gravity * mass->mass());
-        for(auto spring : *mass->springs())
-            total_force = total_force + (mass == spring->mass1()
+        Vector total_force = mass.force() + (this->m_gravity * mass.mass());
+        for(auto spring : *mass.springs())
+            total_force = total_force + (&mass == spring->mass1()
                 ? spring->force()
                 : spring->force() * -1.0f);
-        Vector speed = mass->speed() + total_force / mass->mass();
+        Vector speed = mass.speed() + total_force / mass.mass();
         speed = speed * this->DAMPING;
-        mass->set_speed(speed);
-        mass->set_position(mass->position() + speed * interval);
+        mass.set_speed(speed);
+        mass.set_position(mass.position() + speed * interval);
     }
-    for(auto spring : *this->springs())
-        spring->update_force();
 }

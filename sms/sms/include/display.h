@@ -60,9 +60,9 @@ class Display : public QGLWidget {
         void draw_axis(float height);
         void draw_circle(float radius);
         void draw_system(SpringMassSystem * system);
-        void draw_springs_non_textured(SpringMassSystem * system);
+        void draw_springs_non_textured(const SpringMassSystem * system);
         void draw_springs_textured(SpringMassSystem * system);
-        void draw_masses(SpringMassSystem * system, GLenum mode);
+        void draw_masses(const SpringMassSystem * system, GLenum mode);
         void draw_hud();
         void draw_number(unsigned int n);
         void update_fps();
