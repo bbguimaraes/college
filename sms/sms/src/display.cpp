@@ -104,7 +104,7 @@ void Display::select(Vector click) {
         glPushName(0);
         this->draw_masses(system, GL_SELECT);
         if(glRenderMode(GL_RENDER) != 0) {
-            selected = system->masses()[select_buffer[3]];
+            selected = (*system->masses())[select_buffer[3]];
             break;
         }
     }
@@ -194,7 +194,7 @@ void Display::draw_springs_non_textured(SpringMassSystem * system) {
     glLineWidth(5.0f);
     glColor3f(0.0f, 1.0f, 0.0f);
     glBegin(GL_LINES);
-    for(auto spring : system->springs()) {
+    for(auto spring : *system->springs()) {
         auto p0 = spring->mass0()->position();
         auto p1 = spring->mass1()->position();
         glVertex3f(p0.x(), p0.y(), p0.z());
@@ -211,7 +211,7 @@ void Display::draw_springs_textured(SpringMassSystem * system) {
     const float WIDTH_F = static_cast<float>(WIDTH);
     auto point = [WIDTH, WIDTH_F, masses](int x, int y) {
         glTexCoord2f(x / WIDTH_F, y / WIDTH_F);;
-        auto p = masses[y * WIDTH + x]->position();
+        auto p = (*masses)[y * WIDTH + x]->position();
         glVertex3f(p.x(), p.y(), p.z());;
     };
     glEnable(GL_TEXTURE_2D);
@@ -219,7 +219,7 @@ void Display::draw_springs_textured(SpringMassSystem * system) {
     glColor3f(1.0f, 1.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D, this->m_texture);
     glBegin(GL_TRIANGLES);
-    for(unsigned int y = 0; y < masses.size() / WIDTH - 1; ++y)
+    for(unsigned int y = 0; y < masses->size() / WIDTH - 1; ++y)
         for(unsigned int x = 0; x < WIDTH - 1; ++x) {
             point(x    , y    );
             point(x    , y + 1);
@@ -238,7 +238,7 @@ void Display::draw_masses(SpringMassSystem * system, GLenum mode) {
         this->m_quadric = gluNewQuadric();
     glPushAttrib(GL_CURRENT_BIT);
     unsigned int index = 0;
-    for(auto mass : system->masses()) {
+    for(auto mass : *system->masses()) {
         if(mode == GL_SELECT)
             glLoadName(index++);
         glPushMatrix();
