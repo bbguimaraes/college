@@ -1,0 +1,13 @@
+Spring-Mass System
+==================
+
+A library to simulate systems of masses and springs attached to them.  Also
+includes a graphical (opengl) program for testing.
+
+
+Building and running
+--------------------
+
+    $ qmake
+    $ make
+    $ (cd sms && LD_LIBRARY_PATH=../libsms ./sms)
