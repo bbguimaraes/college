@@ -90,20 +90,24 @@ void Rendering::draw_springs_non_textured(const SpringMassSystem * system) {
 }
 
 /*static*/
-void Rendering::draw_springs_textured(SpringMassSystem * system) {
+void Rendering::draw_springs_textured(
+        SpringMassSystem * system,
+        unsigned int texture_width, unsigned int texture_height) {
     auto masses = system->masses();
-    const unsigned int WIDTH = 10;
-    const float WIDTH_F = static_cast<float>(WIDTH);
-    auto point = [WIDTH, WIDTH_F, masses](int x, int y) {
-        glTexCoord2f(x / WIDTH_F, y / WIDTH_F);;
-        auto p = (*masses)[y * WIDTH + x].position();
-        glVertex3f(p.x(), p.y(), p.z());;
-    };
+    const float WIDTH_F = static_cast<float>(texture_width - 1);
+    const float HEIGHT_F = static_cast<float>(texture_height - 1);
+    auto point =
+        [WIDTH_F, HEIGHT_F, texture_width, texture_height, masses]
+        (int x, int y) {
+            glTexCoord2f(x / WIDTH_F, y / HEIGHT_F);;
+            auto p = (*masses)[y * texture_width + x].position();
+            glVertex3f(p.x(), p.y(), p.z());;
+        };
     glPushAttrib(GL_CURRENT_BIT);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_TRIANGLES);
-    for(unsigned int y = 0; y < masses->size() / WIDTH - 1; ++y)
-        for(unsigned int x = 0; x < WIDTH - 1; ++x) {
+    for(unsigned int y = 0; y < masses->size() / texture_width - 1; ++y)
+        for(unsigned int x = 0; x < texture_width - 1; ++x) {
             point(x    , y    );
             point(x    , y + 1);
             point(x + 1, y + 1);
