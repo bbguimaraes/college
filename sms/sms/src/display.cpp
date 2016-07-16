@@ -12,6 +12,7 @@ Display::Display(QWidget * parent) :
         m_selected(nullptr),
         m_texture(0),
         m_quadric(nullptr),
+        m_last_select(QTime::currentTime()),
         m_last_frame(QTime::currentTime()),
         m_ctrl_key_down(false),
         m_draw_grid(false),
@@ -61,7 +62,10 @@ void Display::paintGL() {
     Rendering::draw_hud(this->m_fps);
 }
 
-void Display::select(Vector click) {
+void Display::select(Vector click, bool rate_limit) {
+    if(rate_limit && this->m_last_select.elapsed() < this->SELECT_RATE_LIMIT)
+        return;
+    this->m_last_select = QTime::currentTime();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT, viewport);
@@ -176,7 +180,7 @@ void Display::keyReleaseEvent(QKeyEvent * event) {
 void Display::mousePressEvent(QMouseEvent * event) {
     this->m_click_position = Vector(event->x(), event->y());
     if(event->button() == Qt::LeftButton)
-        this->select(this->m_click_position);
+        this->select(this->m_click_position, false);
 }
 
 void Display::mouseReleaseEvent(QMouseEvent * event) {
@@ -198,7 +202,7 @@ void Display::mouseMoveEvent(QMouseEvent * event) {
         }
     } else {
         if(!(event->buttons() & Qt::LeftButton))
-            this->select(position);
+            this->select(position, true);
         else if(this->m_selected) {
             auto move = (this->m_click_position - position)
                 / this->m_camera.distance();
