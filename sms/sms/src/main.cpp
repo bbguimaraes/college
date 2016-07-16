@@ -8,17 +8,19 @@
 
 void init_simulations(Simulation * simulations, SpringMassSystem * systems);
 void init_display(Display * display);
-void init_sm_system0(SpringMassSystem * system);
-void init_sm_system1(SpringMassSystem * system, unsigned int width);
+void init_sm_system0(SpringMassSystem * system, bool fixed_end);
+void init_sm_system1(
+    SpringMassSystem * system, unsigned int width, unsigned int height);
 void init_sm_system2(SpringMassSystem * system, unsigned int width);
+void init_sm_system3(SpringMassSystem * system, unsigned int side);
 GLuint load_texture(const std::string & filename);
 void move_system(SpringMassSystem * system, Vector v);
 
 int main(int argc, char ** argv) {
     const double UPDATE_RATE = 1.0f / 3000.0f;
     QApplication app(argc, argv);
-    SpringMassSystem systems[2];
-    Simulation simulations[2];
+    SpringMassSystem systems[6];
+    Simulation simulations[4];
     init_simulations(simulations, systems);
     for(auto & x : simulations) {
         x.set_paused(true);
@@ -26,7 +28,8 @@ int main(int argc, char ** argv) {
     }
     Display display;
     init_display(&display);
-    display.set_simulations({&simulations[0], &simulations[1]});
+    display.set_simulations(
+        {&simulations[0], &simulations[1], &simulations[2], &simulations[3]});
     display.show();
     QTimer timer;
     QObject::connect(
@@ -40,17 +43,29 @@ int main(int argc, char ** argv) {
 }
 
 void init_simulations(Simulation * simulations, SpringMassSystem * systems) {
-    const unsigned int S1_W = 10, S2_W = 10;
-    init_sm_system1(&systems[0], S1_W),
-    init_sm_system2(&systems[1], S2_W),
-    move_system(&systems[0], Vector(-10.0f, 0.0f));
-    move_system(&systems[1], Vector( 10.0f, 0.0f));
-    simulations[0].set_systems({&systems[0]});
-    simulations[1].set_systems({&systems[1]});
-    simulations[0].set_texturable(true);
+    const unsigned int S1_W = 14, S1_H = 11, S2_W = 11;
+    init_sm_system0(&systems[0], false),
+    init_sm_system0(&systems[1], true),
+    init_sm_system1(&systems[2], S1_W, S1_H),
+    init_sm_system2(&systems[3], S2_W),
+    init_sm_system3(&systems[4], 5),
+    init_sm_system3(&systems[5], 10),
+    move_system(&systems[0], Vector(  0.0f,  5.0f));
+    move_system(&systems[1], Vector( -1.0f, 10.0f));
+    move_system(&systems[2], Vector(-15.0f, -5.0f));
+    move_system(&systems[3], Vector(  5.0f, -5.0f));
+    move_system(&systems[4], Vector(-15.0f, -10.0f, -5.0f));
+    move_system(&systems[5], Vector(  5.0f, -10.0f, -5.0f));
+    simulations[0].set_systems({&systems[0], &systems[1]});
+    simulations[1].set_systems({&systems[2]});
+    simulations[2].set_systems({&systems[3]});
+    simulations[3].set_systems({&systems[4], &systems[5]});
     simulations[1].set_texturable(true);
-    simulations[0].set_texture_width(S1_W);
-    simulations[1].set_texture_width(S2_W);
+    simulations[2].set_texturable(true);
+    simulations[1].set_texture_width(S1_W);
+    simulations[2].set_texture_width(S2_W);
+    simulations[1].set_texture_height(S1_H);
+    simulations[2].set_texture_height(S2_W);
 }
 
 void init_display(Display * display) {
@@ -61,33 +76,50 @@ void init_display(Display * display) {
     display->resize(800, 600);
 }
 
-void init_sm_system0(SpringMassSystem * system) {
+void init_sm_system0(SpringMassSystem * system, bool fixed_end) {
     SMSCreator::create_string(
         system,
         Vector(),
-        Vector(5.0f, 0.0f, 0.0f),
-        10, 1, 1);
+        Vector(2.0f, 0.0f, 0.0f),
+        10, 0.1f, 1);
     (*system->masses())[0].set_fixed(true);
+    (*system->masses())[9].set_fixed(fixed_end);
 }
 
-void init_sm_system1(SpringMassSystem * system, unsigned int width) {
+void init_sm_system1(
+        SpringMassSystem * system, unsigned int width, unsigned int height) {
     SMSCreator::create_flag(
         system,
-        Vector(-5.0f, 10.0f), Vector(5.0f, 0.0f),
-        width, 5,
-        1.0f, 30.0f);
-    (*system->masses())[0].set_fixed(true);
-    (*system->masses())[width - 1].set_fixed(true);
+        Vector(0.0f, 0.0f), Vector(10.0f, 10.0f),
+        width, height,
+        2.0f, 20.0f);
+    (*system->masses())[width * (height - 1)].set_fixed(true);
+    (*system->masses())[width *  height - 1 ].set_fixed(true);
 }
 
 void init_sm_system2(SpringMassSystem * system, unsigned int width) {
     SMSCreator::create_crossed_flag(
         system,
-        Vector(-5.0f, 10.0f), Vector(5.0f, 0.0f),
-        width, 5,
+        Vector(0.0f, 0.0f), Vector(10.0f, 10.0f),
+        width, width,
         1.0f, 10.0f);
-    (*system->masses())[0].set_fixed(true);
-    (*system->masses())[width - 1].set_fixed(true);
+    (*system->masses())[width * (width - 1)].set_fixed(true);
+    (*system->masses())[width *  width - 1 ].set_fixed(true);
+}
+
+void init_sm_system3(SpringMassSystem * system, unsigned int side) {
+    const float SIZE = 10.0f;
+    SMSCreator::create_crossed_flag(
+        system,
+        Vector(0.0f, SIZE), Vector(SIZE, 0.0f),
+        side, side,
+        1.0f, 10.0f);
+    for(auto & x : *system->masses()) {
+        auto p = x.position();
+        if(!p.x() || !p.y() || p.x() == SIZE || p.y() == SIZE)
+            x.set_fixed(true);
+        x.set_position(Vector(p.x(), p.z(), p.y()));
+    }
 }
 
 GLuint load_texture(const std::string & filename) {
