@@ -21,6 +21,7 @@ class Display : public QGLWidget {
     const unsigned int GRID_SIZE = 100;
     const float AXES_HEIGHT = 5.0f;
     const unsigned int AXES_SLICES = 32;
+    const float SELECT_RATE_LIMIT = 1000.0f / 5.0f;
 
     public:
         Display(QWidget * parent = nullptr);
@@ -52,7 +53,7 @@ class Display : public QGLWidget {
         virtual void wheelEvent(QWheelEvent * event);
 
     private:
-        void select(Vector click);
+        void select(Vector click, bool rate_limit);
         void draw_simulation(Simulation * s);
         void update_fps();
 
@@ -62,6 +63,7 @@ class Display : public QGLWidget {
         GLuint m_texture;
         GLUquadric * m_quadric;
 
+        QTime m_last_select;
         QTime m_last_frame;
         unsigned int m_frame_count;
         unsigned int m_fps;
