@@ -17,7 +17,9 @@ class Rendering {
         static void draw_axis(GLUquadric * q, unsigned int slices);
         static void draw_axes(GLUquadric * q, unsigned int slices);
         static void draw_springs_non_textured(const SpringMassSystem * system);
-        static void draw_springs_textured(SpringMassSystem * system);
+        static void draw_springs_textured(
+            SpringMassSystem * system,
+            unsigned int texture_width, unsigned int texture_height);
         static void draw_masses(
             const SpringMassSystem * system,
             GLenum mode,

@@ -118,7 +118,8 @@ void Display::draw_simulation(Simulation * s) {
         } else {
             glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, this->m_texture);
-            Rendering::draw_springs_textured(system);
+            Rendering::draw_springs_textured(
+                system, s->texture_width(), s->texture_height());
             glDisable(GL_TEXTURE_2D);
         }
         if(s->draw_masses())

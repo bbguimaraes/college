@@ -26,6 +26,10 @@ int main(int argc, char ** argv) {
     simulations[1].set_update_rate(UPDATE_RATE);
     simulations[0].set_texturable(true);
     simulations[1].set_texturable(true);
+    simulations[0].set_texture_width(10);
+    simulations[1].set_texture_width(10);
+    simulations[0].set_texture_height(5);
+    simulations[1].set_texture_height(5);
     for(auto & mass : *sms0.masses())
         mass.set_position(mass.position() + Vector(-10.0f));
     for(auto & mass : *sms1.masses())

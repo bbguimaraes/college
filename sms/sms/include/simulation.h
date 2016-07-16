@@ -12,13 +12,17 @@ class Simulation {
     bool m_draw_masses;
     bool m_textured;
     bool m_texturable;
+    unsigned int m_texture_width;
+    unsigned int m_texture_height;
 
     public:
         Simulation() :
             m_paused(false),
             m_draw_masses(true),
             m_textured(false),
-            m_texturable(false) {}
+            m_texturable(false),
+            m_texture_width(0),
+            m_texture_height(0) {}
 
         const std::vector<SpringMassSystem *> * systems() const
             {return &this->m_systems;}
@@ -27,6 +31,8 @@ class Simulation {
         bool draw_masses() const {return this->m_draw_masses;}
         bool textured() const {return this->m_textured;}
         bool texturable() const {return this->m_texturable;}
+        unsigned int texture_width() const {return this->m_texture_width;}
+        unsigned int texture_height() const {return this->m_texture_height;}
 
         void set_systems(const std::vector<SpringMassSystem *> & v)
             {this->m_systems = v;}
@@ -35,6 +41,8 @@ class Simulation {
         void set_draw_masses(bool d) {this->m_draw_masses = d;}
         void set_textured(bool t) {this->m_textured = t;}
         void set_texturable(bool t) {this->m_texturable = t;}
+        void set_texture_width(unsigned int w) {this->m_texture_width = w;}
+        void set_texture_height(unsigned int h) {this->m_texture_height = h;}
 
         void update();
 };
