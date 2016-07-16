@@ -10,8 +10,6 @@ class SpringMassSystem;
 
 class SMSCreator {
     public:
-        static void read_from_file(
-            SpringMassSystem * system, std::istream * input);
         static void create_string(
             SpringMassSystem * system,
             Vector begin, Vector end,

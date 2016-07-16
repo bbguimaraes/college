@@ -1,5 +1,3 @@
-#include <sstream>
-
 #include <QApplication>
 #include <QTimer>
 
@@ -11,15 +9,14 @@
 void init_sm_system0(SpringMassSystem * system);
 void init_sm_system1(SpringMassSystem * system);
 void init_sm_system2(SpringMassSystem * system);
-void init_sm_system3(SpringMassSystem * system);
 GLuint load_texture(const std::string & filename);
 
 int main(int argc, char ** argv) {
     const double UPDATE_RATE = 1.0f / 3000.0f;
     QApplication app(argc, argv);
     SpringMassSystem sms0, sms1;
-    init_sm_system3(&sms0);
-    init_sm_system2(&sms1);
+    init_sm_system2(&sms0);
+    init_sm_system1(&sms1);
     Simulation simulations[2];
     simulations[0].set_systems({&sms0});
     simulations[1].set_systems({&sms1});
@@ -54,22 +51,6 @@ int main(int argc, char ** argv) {
 }
 
 void init_sm_system0(SpringMassSystem * system) {
-    std::stringstream input(
-        "# begin\n"
-        "0.0 0.0 0.0\n"
-        "# end\n"
-        "10.0 0.0 0.0\n"
-        "# number of Masses\n"
-        "11\n"
-        "# total mass\n"
-        "0.1\n"
-        "# spring k constant\n"
-        "0.25\n");
-    SMSCreator::read_from_file(system, &input);
-    (*system->masses())[0].set_fixed(true);
-}
-
-void init_sm_system1(SpringMassSystem * system) {
     SMSCreator::create_string(
         system,
         Vector(),
@@ -78,7 +59,7 @@ void init_sm_system1(SpringMassSystem * system) {
     (*system->masses())[0].set_fixed(true);
 }
 
-void init_sm_system2(SpringMassSystem * system) {
+void init_sm_system1(SpringMassSystem * system) {
     const unsigned int W = 10;
     SMSCreator::create_flag(
         system,
@@ -89,7 +70,7 @@ void init_sm_system2(SpringMassSystem * system) {
     (*system->masses())[W - 1].set_fixed(true);
 }
 
-void init_sm_system3(SpringMassSystem * system) {
+void init_sm_system2(SpringMassSystem * system) {
     const unsigned int W = 10;
     SMSCreator::create_crossed_flag(
         system,
