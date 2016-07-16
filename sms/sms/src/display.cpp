@@ -143,6 +143,9 @@ void Display::keyPressEvent(QKeyEvent * event) {
         case 'A':
             this->m_draw_axes = !this->m_draw_axes;
             break;
+        case 'F':
+            this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
+            break;
         case 'G':
             this->m_draw_grid = !this->m_draw_grid;
             break;
