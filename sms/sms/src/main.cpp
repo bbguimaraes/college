@@ -15,10 +15,18 @@ void init_sm_system3(SpringMassSystem * system);
 GLuint load_texture(const std::string & filename);
 
 int main(int argc, char ** argv) {
+    const double UPDATE_RATE = 1.0f / 5000.0f;
     QApplication app(argc, argv);
     SpringMassSystem sms0, sms1;
     init_sm_system3(&sms0);
-    init_sm_system3(&sms1);
+    init_sm_system2(&sms1);
+    Simulation simulations[2];
+    simulations[0].set_systems({&sms0});
+    simulations[1].set_systems({&sms1});
+    simulations[0].set_paused(true);
+    simulations[1].set_paused(true);
+    simulations[0].set_update_rate(UPDATE_RATE);
+    simulations[1].set_update_rate(UPDATE_RATE);
     for(auto & mass : *sms0.masses())
         mass.set_position(mass.position() + Vector(-10.0f));
     for(auto & mass : *sms1.masses())
@@ -26,23 +34,20 @@ int main(int argc, char ** argv) {
     Display display;
     display.makeCurrent();
     display.set_texture(load_texture("texture.jpg"));
-    display.set_systems({&sms0, &sms1});
-    display.set_update_rate(1.0f / 5000.0f);
-    display.set_paused(true);
-    display.set_textured(false);
+    display.set_simulations({&simulations[0], &simulations[1]});
     display.camera()->set_distance(30.0f);
     display.setMouseTracking(true);
     display.resize(800, 600);
     display.show();
     QTimer display_timer, simulation_timer;
     QObject::connect(
-        &display_timer, SIGNAL(timeout()),
-        &display, SLOT(update_systems()));
+        &display_timer, &QTimer::timeout,
+        [&simulations](){for(auto & x : simulations) x.update();});
     QObject::connect(
-        &simulation_timer, SIGNAL(timeout()),
-        &display, SLOT(update()));
+        &simulation_timer, &QTimer::timeout,
+        &display, static_cast<void (Display::*)()>(&Display::update));
     display_timer.start(1.0f / 60.0f);
-    simulation_timer.start(display.update_rate());
+    simulation_timer.start(UPDATE_RATE);
     return app.exec();
 }
 
