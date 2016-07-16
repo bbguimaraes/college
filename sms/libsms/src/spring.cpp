@@ -3,10 +3,8 @@
 
 void Spring::update_force() {
     this->m_distance = this->mass1()->position() - this->mass0()->position();
-    float displacement = this->distance().magnitude() - this->eq_length();
+    const float DISTANCE_MAG = this->distance().magnitude();
     // Hooke's law: F = kX
-    float force = this->k() * displacement;
-    // TODO remove normalization?
-    // can the force be derived from the original value of distance?
-    this->m_force = this->distance().normalized().scaled(-force);
+    float force = this->k() * (DISTANCE_MAG - this->eq_length());
+    this->m_force = this->distance().scaled(-force / DISTANCE_MAG);
 }
