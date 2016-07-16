@@ -2,50 +2,10 @@
 
 #include <cassert>
 #include <cmath>
-#include <fstream>
-#include <sstream>
 
 #include "sms/mass.h"
 #include "sms/spring.h"
 #include "sms/springmasssystem.h"
-
-/**
- * Reads a SpringMassSystem from a file. Example of file:
- *
- * # begin
- * 5.0 4.0 0.0
- * # end
- * -5.0 4.0 0.0
- * # number of Masses
- * 51
- * # total mass
- * 1
- * # spring k constant
- * 1.0
- */
-/*static*/
-void SMSCreator::read_from_file(
-        SpringMassSystem * system, std::istream * input) {
-    auto next_line = [input]() -> std::string {
-        std::string line;
-        do {
-            getline(*input, line);
-        } while(line[0] == '#');
-        return line;
-    };
-    auto read_point = [next_line]() -> Vector {
-        auto ss = std::stringstream(next_line());
-        float x, y, z;
-        ss >> x >> y >> z;
-        return Vector(x, y, z);
-    };
-    auto p0 = read_point();
-    auto p1 = read_point();
-    auto n_masses = std::stoi(next_line());
-    auto total_mass = std::stof(next_line());
-    auto k = std::stof(next_line());
-    return SMSCreator::create_string(system, p0, p1, n_masses, total_mass, k);
-}
 
 /*static*/
 void SMSCreator::create_string(
