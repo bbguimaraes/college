@@ -5,7 +5,7 @@
 #include "sms/spring.h"
 
 /*static*/
-const float SpringMassSystem::DAMPING = 0.95f;
+const float SpringMassSystem::DAMPING = 0.98f;
 
 /*static*/
 void SpringMassSystem::link(Mass * mass0, Mass * mass1, Spring * spring) {

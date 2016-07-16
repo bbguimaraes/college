@@ -177,7 +177,9 @@ void SMSCreator::create_crossed_flag(
         for(unsigned int x = 0; x < x_masses - 1; ++x) {
             link(x    , y, x + 1, y    , INCREMENT.x());
             link(x    , y, x    , y + 1, INCREMENT.y());
+            spring_it->set_k(k * 0.05f);
             link(x    , y, x + 1, y + 1, INCREMENT_LENGTH);
+            spring_it->set_k(k * 0.05f);
             link(x + 1, y, x    , y + 1, INCREMENT_LENGTH);
         }
         link(x_masses - 1, y, x_masses - 1, y + 1, INCREMENT.y());

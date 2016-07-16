@@ -15,7 +15,7 @@ void init_sm_system3(SpringMassSystem * system);
 GLuint load_texture(const std::string & filename);
 
 int main(int argc, char ** argv) {
-    const double UPDATE_RATE = 1.0f / 5000.0f;
+    const double UPDATE_RATE = 1.0f / 3000.0f;
     QApplication app(argc, argv);
     SpringMassSystem sms0, sms1;
     init_sm_system3(&sms0);
@@ -82,7 +82,7 @@ void init_sm_system2(SpringMassSystem * system) {
         system,
         Vector(-5.0f, 10.0f), Vector(5.0f, 0.0f),
         W, 5,
-        1.0f, 10.0f);
+        1.0f, 30.0f);
     (*system->masses())[0].set_fixed(true);
     (*system->masses())[W - 1].set_fixed(true);
 }
