@@ -42,15 +42,14 @@ int main(int argc, char ** argv) {
     display.setMouseTracking(true);
     display.resize(800, 600);
     display.show();
-    QTimer display_timer, simulation_timer;
+    QTimer timer;
     QObject::connect(
-        &display_timer, &QTimer::timeout,
+        &timer, &QTimer::timeout,
         [&simulations](){for(auto & x : simulations) x.update();});
     QObject::connect(
-        &simulation_timer, &QTimer::timeout,
-        &display, static_cast<void (Display::*)()>(&Display::update));
-    display_timer.start(1.0f / 60.0f);
-    simulation_timer.start(UPDATE_RATE);
+        &timer, &QTimer::timeout,
+        &display, &Display::updateGL);
+    timer.start(1000.0f / 60.0f);
     return app.exec();
 }
 
