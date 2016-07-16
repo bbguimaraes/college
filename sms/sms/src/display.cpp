@@ -14,16 +14,12 @@
 Display::Display(QWidget * parent) :
         QGLWidget(parent),
         m_selected(nullptr),
-        m_update_rate(1.0f),
         m_texture(0),
         m_quadric(nullptr),
         m_last_frame(QTime::currentTime()),
         m_ctrl_key_down(false),
-        m_paused(false),
         m_draw_grid(false),
         m_draw_axes(false),
-        m_draw_masses(true),
-        m_textured(false),
         m_grid_size(100) {
     this->setFocusPolicy(Qt::StrongFocus);
 }
@@ -58,8 +54,8 @@ void Display::paintGL() {
         this->draw_grid();
     if(this->m_draw_axes)
         this->draw_axes();
-    for(auto x : this->m_systems)
-        this->draw_system(x);
+    for(auto x : this->m_simulations)
+        this->draw_simulation(x);
     this->update_fps();
     this->draw_hud();
 }
@@ -98,16 +94,17 @@ void Display::select(Vector click) {
     glLoadIdentity();
     this->set_camera();
     Mass * selected = nullptr;
-    for(auto system : this->m_systems) {
-        glRenderMode(GL_SELECT);
-        glInitNames();
-        glPushName(0);
-        this->draw_masses(system, GL_SELECT);
-        if(glRenderMode(GL_RENDER) != 0) {
-            selected = &(*system->masses())[select_buffer[3]];
-            break;
+    for(auto simulation : this->m_simulations)
+        for(auto system : *simulation->systems()) {
+            glRenderMode(GL_SELECT);
+            glInitNames();
+            glPushName(0);
+            this->draw_masses(system, GL_SELECT);
+            if(glRenderMode(GL_RENDER) != 0) {
+                selected = &(*system->masses())[select_buffer[3]];
+                break;
+            }
         }
-    }
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     this->m_selected = selected;
@@ -115,10 +112,8 @@ void Display::select(Vector click) {
 
 /*slot*/
 void Display::update_systems() {
-    if(this->paused())
-        return;
-    for(auto x : this->m_systems)
-        x->update(this->m_update_rate);
+    for(auto x : this->m_simulations)
+        x->update();
 }
 
 void Display::draw_grid() {
@@ -180,13 +175,15 @@ void Display::draw_circle(float radius) {
     glEnd();
 }
 
-void Display::draw_system(SpringMassSystem * system) {
-    if(!this->textured())
-        this->draw_springs_non_textured(system);
-    else
-        this->draw_springs_textured(system);
-    if(this->m_draw_masses)
-        this->draw_masses(system, GL_RENDER);
+void Display::draw_simulation(Simulation * s) {
+    for(auto system : *s->systems()) {
+        if(!s->textured())
+            this->draw_springs_non_textured(system);
+        else
+            this->draw_springs_textured(system);
+        if(s->draw_masses())
+            this->draw_masses(system, GL_RENDER);
+    }
 }
 
 void Display::draw_springs_non_textured(const SpringMassSystem * system) {
@@ -320,13 +317,16 @@ void Display::keyPressEvent(QKeyEvent * event) {
             this->m_draw_grid = !this->m_draw_grid;
             break;
         case 'M':
-            this->m_draw_masses = !this->m_draw_masses;
+            for(auto x : this->m_simulations)
+                x->set_draw_masses(!x->draw_masses());
             break;
         case 'P':
-            this->m_paused = !this->m_paused;
+            for(auto x : this->m_simulations)
+                x->set_paused(!x->paused());
             break;
         case 'T':
-            this->m_textured = !this->m_textured;
+            for(auto x : this->m_simulations)
+                x->set_textured(!x->textured());
             break;
         case Qt::Key_Control:
             this->m_ctrl_key_down = true;

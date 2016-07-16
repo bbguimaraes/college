@@ -8,6 +8,7 @@
 
 #include "sms/vector.h"
 #include "camera.h"
+#include "simulation.h"
 
 class GLUquadric;
 
@@ -21,21 +22,14 @@ class Display : public QGLWidget {
         Display(QWidget * parent = nullptr);
         ~Display();
 
-        float update_rate() const {return this->m_update_rate;}
         Camera * camera() {return &this->m_camera;}
-        bool paused() const {return this->m_paused;}
-        bool textured() const {return this->m_textured;}
 
-        void set_systems(const std::vector<SpringMassSystem *> & v)
-            {this->m_systems = v;}
-        void set_update_rate(float r) {this->m_update_rate = r;}
+        void set_simulations(const std::vector<Simulation *> & v)
+            {this->m_simulations = v;}
         void set_texture(GLuint t) {this->m_texture = t;}
-        void set_paused(bool p) {this->m_paused = p;}
         void set_draw_grid(bool d) {this->m_draw_grid = d;}
         void set_grid_size(int s) {this->m_grid_size = s;}
         void set_draw_axes(bool d) {this->m_draw_axes = d;}
-        void set_draw_masses(bool d) {this->m_draw_masses = d;}
-        void set_textured(bool t) {this->m_textured = t;}
 
     public slots:
         void update_systems();
@@ -59,7 +53,7 @@ class Display : public QGLWidget {
         void draw_axes();
         void draw_axis(float height);
         void draw_circle(float radius);
-        void draw_system(SpringMassSystem * system);
+        void draw_simulation(Simulation * s);
         void draw_springs_non_textured(const SpringMassSystem * system);
         void draw_springs_textured(SpringMassSystem * system);
         void draw_masses(const SpringMassSystem * system, GLenum mode);
@@ -67,9 +61,8 @@ class Display : public QGLWidget {
         void draw_number(unsigned int n);
         void update_fps();
 
-        std::vector<SpringMassSystem *> m_systems;
+        std::vector<Simulation *> m_simulations;
         Mass * m_selected;
-        float m_update_rate;
         Camera m_camera;
         GLuint m_texture;
         GLUquadric * m_quadric;
@@ -82,11 +75,8 @@ class Display : public QGLWidget {
         Vector m_click_position;
         Vector m_last_position;
 
-        bool m_paused;
         bool m_draw_grid;
         bool m_draw_axes;
-        bool m_draw_masses;
-        bool m_textured;
         int m_grid_size;
 };
 
