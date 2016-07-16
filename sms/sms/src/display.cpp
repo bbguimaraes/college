@@ -1,15 +1,11 @@
 #include "display.h"
 
-#include <cassert>
-#include <cmath>
-
 #include <GL/glu.h>
 
 #include <QWheelEvent>
 
 #include "sms/springmasssystem.h"
-#include "sms/mass.h"
-#include "sms/spring.h"
+#include "rendering.h"
 
 Display::Display(QWidget * parent) :
         QGLWidget(parent),
@@ -19,13 +15,13 @@ Display::Display(QWidget * parent) :
         m_last_frame(QTime::currentTime()),
         m_ctrl_key_down(false),
         m_draw_grid(false),
-        m_draw_axes(false),
-        m_grid_size(100) {
+        m_draw_axes(false) {
     this->setFocusPolicy(Qt::StrongFocus);
 }
 
 Display::~Display() {
-    gluDeleteQuadric(this->m_quadric);
+    if(this->m_quadric)
+        gluDeleteQuadric(this->m_quadric);
 }
 
 /*virtual*/
@@ -34,6 +30,7 @@ void Display::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClearDepth(1.0);
+    this->m_quadric = gluNewQuadric();
 }
 
 /*virtual*/
@@ -41,7 +38,7 @@ void Display::resizeGL(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glViewport(0, 0, w, h);
-    gluPerspective(60.0, static_cast<double>(w) / h, 0.1, 1000.0);
+    gluPerspective(60.0, static_cast<double>(w) / h, 0.1, 500.0);
 }
 
 /*virtual*/
@@ -49,25 +46,19 @@ void Display::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    this->set_camera();
-    if(this->m_draw_grid)
-        this->draw_grid();
-    if(this->m_draw_axes)
-        this->draw_axes();
+    Rendering::set_camera(this->m_camera);
+    if(this->draw_grid())
+        Rendering::draw_grid(this->GRID_SIZE);
+    if(this->draw_axes()) {
+        glPushMatrix();
+        glScalef(this->AXES_HEIGHT, this->AXES_HEIGHT, this->AXES_HEIGHT);
+        Rendering::draw_axes(this->m_quadric, this->AXES_SLICES);
+        glPopMatrix();
+    }
     for(auto x : this->m_simulations)
         this->draw_simulation(x);
     this->update_fps();
-    this->draw_hud();
-}
-
-void Display::set_camera() {
-    glTranslatef(0.0f, 0.0f, -this->m_camera.distance());
-    auto p = this->m_camera.center();
-    glTranslatef(p.x(), p.y(), p.z());
-    auto r = this->m_camera.rotation();
-    glRotatef(-r.x(), 1.0, 0.0, 0.0);
-    glRotatef(-r.y(), 0.0, 1.0, 0.0);
-    glRotatef(-r.z(), 0.0, 0.0, 1.0);
+    Rendering::draw_hud(this->m_fps);
 }
 
 void Display::select(Vector click) {
@@ -92,14 +83,15 @@ void Display::select(Vector click) {
         1000.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    this->set_camera();
+    Rendering::set_camera(this->m_camera);
     Mass * selected = nullptr;
     for(auto simulation : this->m_simulations)
         for(auto system : *simulation->systems()) {
             glRenderMode(GL_SELECT);
             glInitNames();
             glPushName(0);
-            this->draw_masses(system, GL_SELECT);
+            Rendering::draw_masses(
+                system, GL_SELECT, this->m_quadric, this->m_selected);
             if(glRenderMode(GL_RENDER) != 0) {
                 selected = &(*system->masses())[select_buffer[3]];
                 break;
@@ -116,186 +108,23 @@ void Display::update_systems() {
         x->update();
 }
 
-void Display::draw_grid() {
-    glPushAttrib(GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
-    glLineWidth(1.0f);
-    GLfloat limit = static_cast<GLfloat>(this->m_grid_size);
-    glBegin(GL_LINES);
-    for(int i = 1; i < this->m_grid_size * 2; i++) {
-        if(i == this->m_grid_size)
-            glColor3f(0.0f, 0.5f, 0.0f);
-        else
-            glColor3f(1.0f, 1.0f, 1.0f);
-        glVertex2f( limit - i, -limit    );
-        glVertex2f( limit - i,  limit    );
-        glVertex2f(-limit,      limit - i);
-        glVertex2f( limit,      limit - i);
-    }
-    glEnd();
-    glPopAttrib();
-}
-
-void Display::draw_axes() {
-    const float SIZE = 5.0f;
-    glPushAttrib(GL_CURRENT_BIT);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glColor3f(0.0f, 0.0f, 0.5f);
-    this->draw_axis(SIZE);
-    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-    glColor3f(0.5f, 0.0f, 0.0f);
-    this->draw_axis(SIZE);
-    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-    glColor3f(0.0f, 0.5f, 0.0f);
-    this->draw_axis(SIZE);
-    glPopMatrix();
-    glPopAttrib();
-}
-
-void Display::draw_axis(float height) {
-    const float WIDTH = 0.1f;
-    const unsigned int SLICES = 32;
-    this->draw_circle(WIDTH);
-    gluCylinder(this->m_quadric, WIDTH, WIDTH, height - 1.0f, SLICES, SLICES);
-    glPushMatrix();
-    glTranslatef(0.0f, 0.0f, height - 1.0f);
-    this->draw_circle(WIDTH * 2.0f);
-    gluCylinder(this->m_quadric, WIDTH * 2, 0.0f, 1.0f, SLICES, SLICES);
-    glPopMatrix();
-}
-
-void Display::draw_circle(float radius) {
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    for(unsigned int i = 0; i <= 32; ++i)
-        glVertex2f(
-            std::cos(i / 32.0f * 6.28318f) * radius,
-            std::sin(i / 32.0f * 6.28318f) * radius);
-    glEnd();
-}
-
 void Display::draw_simulation(Simulation * s) {
     for(auto system : *s->systems()) {
-        if(!s->textured())
-            this->draw_springs_non_textured(system);
-        else
-            this->draw_springs_textured(system);
-        if(s->draw_masses())
-            this->draw_masses(system, GL_RENDER);
-    }
-}
-
-void Display::draw_springs_non_textured(const SpringMassSystem * system) {
-    glPushAttrib(GL_CURRENT_BIT | GL_LINE_BIT);
-    glLineWidth(5.0f);
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glBegin(GL_LINES);
-    for(auto & spring : *system->springs()) {
-        auto p0 = spring.mass0()->position();
-        auto p1 = spring.mass1()->position();
-        glVertex3f(p0.x(), p0.y(), p0.z());
-        glVertex3f(p1.x(), p1.y(), p1.z());
-    }
-    glEnd();
-    glPopAttrib();
-}
-
-void Display::draw_springs_textured(SpringMassSystem * system) {
-    assert(this->m_texture);
-    auto masses = system->masses();
-    const unsigned int WIDTH = 10;
-    const float WIDTH_F = static_cast<float>(WIDTH);
-    auto point = [WIDTH, WIDTH_F, masses](int x, int y) {
-        glTexCoord2f(x / WIDTH_F, y / WIDTH_F);;
-        auto p = (*masses)[y * WIDTH + x].position();
-        glVertex3f(p.x(), p.y(), p.z());;
-    };
-    glEnable(GL_TEXTURE_2D);
-    glPushAttrib(GL_CURRENT_BIT);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D, this->m_texture);
-    glBegin(GL_TRIANGLES);
-    for(unsigned int y = 0; y < masses->size() / WIDTH - 1; ++y)
-        for(unsigned int x = 0; x < WIDTH - 1; ++x) {
-            point(x    , y    );
-            point(x    , y + 1);
-            point(x + 1, y + 1);
-            point(x    , y    );
-            point(x + 1, y + 1);
-            point(x + 1, y    );
+        if(!s->textured()) {
+            glPushAttrib(GL_CURRENT_BIT);
+            glColor3f(0.0f, 1.0f, 0.0f);
+            Rendering::draw_springs_non_textured(system);
+            glPopAttrib();
+        } else {
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, this->m_texture);
+            Rendering::draw_springs_textured(system);
+            glDisable(GL_TEXTURE_2D);
         }
-    glEnd();
-    glPopAttrib();
-    glDisable(GL_TEXTURE_2D);
-}
-
-void Display::draw_masses(const SpringMassSystem * system, GLenum mode) {
-    if(!this->m_quadric)
-        this->m_quadric = gluNewQuadric();
-    glPushAttrib(GL_CURRENT_BIT);
-    unsigned int index = 0;
-    for(auto & mass : *system->masses()) {
-        if(mode == GL_SELECT)
-            glLoadName(index++);
-        glPushMatrix();
-        if(&mass == this->m_selected)
-            glColor3f(1.0f, 0.0f, 0.0f);
-        else
-            glColor3f(0.0f, 0.0f, 0.0f);
-        glTranslatef(
-            mass.position().x(),
-            mass.position().y(),
-            mass.position().z());
-        gluSphere(this->m_quadric, 0.1, 16, 16);
-        glPopMatrix();
+        if(s->draw_masses())
+            Rendering::draw_masses(
+                system, GL_RENDER, this->m_quadric, this->m_selected);
     }
-    if(mode == GL_SELECT)
-        glPopName();
-    glPopAttrib();
-}
-
-void Display::draw_hud() {
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    double viewport[4];
-    glGetDoublev(GL_VIEWPORT, viewport);
-    gluOrtho2D(viewport[0], viewport[2], viewport[1], viewport[3]);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    glTranslatef(5.0f, 5.0f, 0.0f);
-    glPushAttrib(GL_CURRENT_BIT);
-    glColor3f(0.0f, 0.0f, 0.0f);
-    this->draw_number(this->m_fps);
-    glPopAttrib();
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-}
-
-void Display::draw_number(unsigned int n) {
-    static const std::vector<std::pair<int, int>> COORDS[10] = {
-        {{ 0,  0}, {10,  0}, {10, 20},  {0, 20},  {0,  0}},
-        {{ 5,  0}, { 5, 20}},
-        {{10,  0}, { 0,  0}, { 0, 10}, {10, 10}, {10, 20}, { 0, 20}},
-        {{ 0,  0}, {10,  0}, {10, 10}, { 0, 10}, {10, 10}, {10, 20}, { 0, 20}},
-        {{10,  0}, {10, 20}, {10, 10}, { 0, 10}, { 0, 20}},
-        {{ 0,  0}, {10,  0}, {10, 10}, { 0, 10}, { 0, 20}, {10, 20}},
-        {{ 0, 20}, { 0,  0}, {10,  0}, {10, 10}, { 0, 10}},
-        {{10,  0}, {10, 20}, { 0, 20}},
-        {{ 0,  0}, {10,  0}, {10, 20}, { 0, 20}, { 0,  0}, { 0, 10}, {10, 10}},
-        {{10,  0}, {10, 20}, { 0, 20}, { 0, 10}, {10, 10}},
-    };
-    if(n > 9) {
-        this->draw_number(n / 10);
-        glTranslatef(30.0f, 0.0f, 0.0f);
-    }
-    glBegin(GL_LINE_STRIP);
-    for(auto x : COORDS[n % 10])
-        glVertex2f(x.first, x.second);
-    glEnd();
 }
 
 void Display::update_fps() {

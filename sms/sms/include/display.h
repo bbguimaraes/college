@@ -18,17 +18,22 @@ class SpringMassSystem;
 class Display : public QGLWidget {
     Q_OBJECT
 
+    const unsigned int GRID_SIZE = 100;
+    const float AXES_HEIGHT = 5.0f;
+    const unsigned int AXES_SLICES = 32;
+
     public:
         Display(QWidget * parent = nullptr);
         ~Display();
 
         Camera * camera() {return &this->m_camera;}
 
+        bool draw_grid() const {return this->m_draw_grid;}
+        bool draw_axes() const {return this->m_draw_axes;}
         void set_simulations(const std::vector<Simulation *> & v)
             {this->m_simulations = v;}
         void set_texture(GLuint t) {this->m_texture = t;}
         void set_draw_grid(bool d) {this->m_draw_grid = d;}
-        void set_grid_size(int s) {this->m_grid_size = s;}
         void set_draw_axes(bool d) {this->m_draw_axes = d;}
 
     public slots:
@@ -47,18 +52,8 @@ class Display : public QGLWidget {
         virtual void wheelEvent(QWheelEvent * event);
 
     private:
-        void set_camera();
         void select(Vector click);
-        void draw_grid();
-        void draw_axes();
-        void draw_axis(float height);
-        void draw_circle(float radius);
         void draw_simulation(Simulation * s);
-        void draw_springs_non_textured(const SpringMassSystem * system);
-        void draw_springs_textured(SpringMassSystem * system);
-        void draw_masses(const SpringMassSystem * system, GLenum mode);
-        void draw_hud();
-        void draw_number(unsigned int n);
         void update_fps();
 
         std::vector<Simulation *> m_simulations;
@@ -77,7 +72,6 @@ class Display : public QGLWidget {
 
         bool m_draw_grid;
         bool m_draw_axes;
-        int m_grid_size;
 };
 
 #endif // DISPLAY_H
