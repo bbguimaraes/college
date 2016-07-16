@@ -11,10 +11,14 @@ class Simulation {
     bool m_paused;
     bool m_draw_masses;
     bool m_textured;
+    bool m_texturable;
 
     public:
-        Simulation() : m_paused(false), m_draw_masses(true), m_textured(false)
-            {}
+        Simulation() :
+            m_paused(false),
+            m_draw_masses(true),
+            m_textured(false),
+            m_texturable(false) {}
 
         const std::vector<SpringMassSystem *> * systems() const
             {return &this->m_systems;}
@@ -22,6 +26,7 @@ class Simulation {
         bool paused() const {return this->m_paused;}
         bool draw_masses() const {return this->m_draw_masses;}
         bool textured() const {return this->m_textured;}
+        bool texturable() const {return this->m_texturable;}
 
         void set_systems(const std::vector<SpringMassSystem *> & v)
             {this->m_systems = v;}
@@ -29,6 +34,7 @@ class Simulation {
         void set_paused(bool p) {this->m_paused = p;}
         void set_draw_masses(bool d) {this->m_draw_masses = d;}
         void set_textured(bool t) {this->m_textured = t;}
+        void set_texturable(bool t) {this->m_texturable = t;}
 
         void update();
 };
