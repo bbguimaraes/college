@@ -51,8 +51,10 @@ int main(int argc, char ** argv) {
 
 void update_simulations(
         std::vector<Simulation> * simulations, Display * display) {
-    const auto F = Vector();
+    const auto W = Vector(0.0f, 0.0f, -0.2f)
+        * (static_cast<float>(std::rand()) / RAND_MAX);
     for(auto & simulation : *simulations) {
+        const auto F = simulation.wind() ? W : Vector();
         for(auto system : *simulation.systems())
             for(auto & mass : *system->masses()) {
                 auto f = F;

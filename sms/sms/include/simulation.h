@@ -14,6 +14,7 @@ class Simulation {
     bool m_texturable;
     unsigned int m_texture_width;
     unsigned int m_texture_height;
+    bool m_wind;
 
     public:
         Simulation() :
@@ -22,7 +23,8 @@ class Simulation {
             m_textured(false),
             m_texturable(false),
             m_texture_width(0),
-            m_texture_height(0) {}
+            m_texture_height(0),
+            m_wind(false) {}
 
         const std::vector<SpringMassSystem *> * systems() const
             {return &this->m_systems;}
@@ -33,6 +35,7 @@ class Simulation {
         bool texturable() const {return this->m_texturable;}
         unsigned int texture_width() const {return this->m_texture_width;}
         unsigned int texture_height() const {return this->m_texture_height;}
+        bool wind() const {return this->m_wind;}
 
         void set_systems(const std::vector<SpringMassSystem *> & v)
             {this->m_systems = v;}
@@ -43,6 +46,7 @@ class Simulation {
         void set_texturable(bool t) {this->m_texturable = t;}
         void set_texture_width(unsigned int w) {this->m_texture_width = w;}
         void set_texture_height(unsigned int h) {this->m_texture_height = h;}
+        void set_wind(bool w) {this->m_wind = w;}
 
         void update();
 };
