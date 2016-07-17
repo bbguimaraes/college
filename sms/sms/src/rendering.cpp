@@ -137,7 +137,7 @@ void Rendering::draw_masses(
             mass.position().x(),
             mass.position().y(),
             mass.position().z());
-        gluSphere(q, 0.1, 16, 16);
+        gluSphere(q, 0.1, 4, 4);
         glPopMatrix();
     }
     if(mode == GL_SELECT)
