@@ -165,6 +165,10 @@ void Display::keyPressEvent(QKeyEvent * event) {
                 if(x->texturable())
                     x->set_textured(!x->textured());
             break;
+        case 'W':
+            for(auto x : this->m_simulations)
+                x->set_wind(!x->wind());
+            break;
         case Qt::Key_Control:
             this->m_ctrl_key_down = true;
             break;
