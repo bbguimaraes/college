@@ -37,6 +37,9 @@ class Display : public QGLWidget {
         void set_draw_grid(bool d) {this->m_draw_grid = d;}
         void set_draw_axes(bool d) {this->m_draw_axes = d;}
 
+        const Mass * selected() const {return this->m_selected;}
+        Vector selected_force() const {return this->m_selected_force;}
+
     public slots:
         void update_systems();
 
@@ -59,6 +62,7 @@ class Display : public QGLWidget {
 
         std::vector<Simulation *> m_simulations;
         Mass * m_selected;
+        Vector m_selected_force;
         Camera m_camera;
         GLuint m_texture;
         GLUquadric * m_quadric;
