@@ -6,7 +6,9 @@
 #include "smscreator.h"
 #include "display.h"
 
-void init_simulations(Simulation * simulations, SpringMassSystem * systems);
+void init_simulations(
+    std::vector<Simulation> * simulations,
+    std::vector<SpringMassSystem> * systems);
 void init_display(Display * display);
 void init_sm_system0(SpringMassSystem * system, bool fixed_end);
 void init_sm_system1(
@@ -16,12 +18,14 @@ void init_sm_system3(SpringMassSystem * system, unsigned int side);
 GLuint load_texture(const std::string & filename);
 void move_system(SpringMassSystem * system, Vector v);
 
+void update_simulations(std::vector<Simulation> * simulations);
+
 int main(int argc, char ** argv) {
     const double UPDATE_RATE = 1.0f / 3000.0f;
     QApplication app(argc, argv);
-    SpringMassSystem systems[6];
-    Simulation simulations[4];
-    init_simulations(simulations, systems);
+    auto systems = std::vector<SpringMassSystem>(6);
+    auto simulations = std::vector<Simulation>(4);
+    init_simulations(&simulations, &systems);
     for(auto & x : simulations) {
         x.set_paused(true);
         x.set_update_rate(UPDATE_RATE);
@@ -34,7 +38,7 @@ int main(int argc, char ** argv) {
     QTimer timer;
     QObject::connect(
         &timer, &QTimer::timeout,
-        [&simulations](){for(auto & x : simulations) x.update();});
+        [&simulations](){update_simulations(&simulations);});
     QObject::connect(
         &timer, &QTimer::timeout,
         &display, &Display::updateGL);
@@ -42,30 +46,37 @@ int main(int argc, char ** argv) {
     return app.exec();
 }
 
-void init_simulations(Simulation * simulations, SpringMassSystem * systems) {
+void update_simulations(std::vector<Simulation> * simulations) {
+    for(auto & simulation : *simulations)
+        simulation.update();
+}
+
+void init_simulations(
+        std::vector<Simulation> * simulations,
+        std::vector<SpringMassSystem> * systems) {
     const unsigned int S1_W = 14, S1_H = 11, S2_W = 11;
-    init_sm_system0(&systems[0], false),
-    init_sm_system0(&systems[1], true),
-    init_sm_system1(&systems[2], S1_W, S1_H),
-    init_sm_system2(&systems[3], S2_W),
-    init_sm_system3(&systems[4], 5),
-    init_sm_system3(&systems[5], 10),
-    move_system(&systems[0], Vector(  0.0f,  5.0f));
-    move_system(&systems[1], Vector( -1.0f, 10.0f));
-    move_system(&systems[2], Vector(-15.0f, -5.0f));
-    move_system(&systems[3], Vector(  5.0f, -5.0f));
-    move_system(&systems[4], Vector(-15.0f, -10.0f, -5.0f));
-    move_system(&systems[5], Vector(  5.0f, -10.0f, -5.0f));
-    simulations[0].set_systems({&systems[0], &systems[1]});
-    simulations[1].set_systems({&systems[2]});
-    simulations[2].set_systems({&systems[3]});
-    simulations[3].set_systems({&systems[4], &systems[5]});
-    simulations[1].set_texturable(true);
-    simulations[2].set_texturable(true);
-    simulations[1].set_texture_width(S1_W);
-    simulations[2].set_texture_width(S2_W);
-    simulations[1].set_texture_height(S1_H);
-    simulations[2].set_texture_height(S2_W);
+    init_sm_system0(&(*systems)[0], false),
+    init_sm_system0(&(*systems)[1], true),
+    init_sm_system1(&(*systems)[2], S1_W, S1_H),
+    init_sm_system2(&(*systems)[3], S2_W),
+    init_sm_system3(&(*systems)[4], 5),
+    init_sm_system3(&(*systems)[5], 10),
+    move_system(&(*systems)[0], Vector(  0.0f,  5.0f));
+    move_system(&(*systems)[1], Vector( -1.0f, 10.0f));
+    move_system(&(*systems)[2], Vector(-15.0f, -5.0f));
+    move_system(&(*systems)[3], Vector(  5.0f, -5.0f));
+    move_system(&(*systems)[4], Vector(-15.0f, -10.0f, -5.0f));
+    move_system(&(*systems)[5], Vector(  5.0f, -10.0f, -5.0f));
+    (*simulations)[0].set_systems({&(*systems)[0], &(*systems)[1]});
+    (*simulations)[1].set_systems({&(*systems)[2]});
+    (*simulations)[2].set_systems({&(*systems)[3]});
+    (*simulations)[3].set_systems({&(*systems)[4], &(*systems)[5]});
+    (*simulations)[1].set_texturable(true);
+    (*simulations)[2].set_texturable(true);
+    (*simulations)[1].set_texture_width(S1_W);
+    (*simulations)[2].set_texture_width(S2_W);
+    (*simulations)[1].set_texture_height(S1_H);
+    (*simulations)[2].set_texture_height(S2_W);
 }
 
 void init_display(Display * display) {
