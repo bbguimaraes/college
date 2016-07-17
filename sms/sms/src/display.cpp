@@ -88,7 +88,7 @@ void Display::select(Vector click, bool rate_limit) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     Rendering::set_camera(this->m_camera);
-    Mass * selected = nullptr;
+    this->m_selected = nullptr;
     for(auto simulation : this->m_simulations)
         for(auto system : *simulation->systems()) {
             glRenderMode(GL_SELECT);
@@ -97,13 +97,12 @@ void Display::select(Vector click, bool rate_limit) {
             Rendering::draw_masses(
                 system, GL_SELECT, this->m_quadric, this->m_selected);
             if(glRenderMode(GL_RENDER) != 0) {
-                selected = &(*system->masses())[select_buffer[3]];
+                this->m_selected = &(*system->masses())[select_buffer[3]];
                 break;
             }
         }
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
-    this->m_selected = selected;
 }
 
 /*slot*/
@@ -185,7 +184,7 @@ void Display::mousePressEvent(QMouseEvent * event) {
 
 void Display::mouseReleaseEvent(QMouseEvent * event) {
     if(event->button() == Qt::LeftButton && this->m_selected)
-        this->m_selected->set_force(Vector());
+        this->m_selected_force = Vector();
 }
 
 void Display::mouseMoveEvent(QMouseEvent * event) {
@@ -206,7 +205,7 @@ void Display::mouseMoveEvent(QMouseEvent * event) {
         else if(this->m_selected) {
             auto move = (this->m_click_position - position)
                 / this->m_camera.distance();
-            this->m_selected->set_force(Vector(-move.x(), move.y()));
+            this->m_selected_force = Vector(-move.x(), move.y());
         }
     }
     this->m_last_position = position;

@@ -18,7 +18,8 @@ void init_sm_system3(SpringMassSystem * system, unsigned int side);
 GLuint load_texture(const std::string & filename);
 void move_system(SpringMassSystem * system, Vector v);
 
-void update_simulations(std::vector<Simulation> * simulations);
+void update_simulations(
+    std::vector<Simulation> * simulations, Display * display);
 
 int main(int argc, char ** argv) {
     const double UPDATE_RATE = 1.0f / 3000.0f;
@@ -38,7 +39,9 @@ int main(int argc, char ** argv) {
     QTimer timer;
     QObject::connect(
         &timer, &QTimer::timeout,
-        [&simulations](){update_simulations(&simulations);});
+        [&simulations, &display]() {
+            update_simulations(&simulations, &display);
+        });
     QObject::connect(
         &timer, &QTimer::timeout,
         &display, &Display::updateGL);
@@ -46,9 +49,19 @@ int main(int argc, char ** argv) {
     return app.exec();
 }
 
-void update_simulations(std::vector<Simulation> * simulations) {
-    for(auto & simulation : *simulations)
+void update_simulations(
+        std::vector<Simulation> * simulations, Display * display) {
+    const auto F = Vector();
+    for(auto & simulation : *simulations) {
+        for(auto system : *simulation.systems())
+            for(auto & mass : *system->masses()) {
+                auto f = F;
+                if(&mass == display->selected())
+                    f = f + display->selected_force();
+                mass.set_force(f);
+            }
         simulation.update();
+    }
 }
 
 void init_simulations(
