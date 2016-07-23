@@ -41,7 +41,8 @@ int main(int argc, char ** argv) {
     QObject::connect(
         &timer, &QTimer::timeout,
         [&simulations, &display]() {
-            update_simulations(&simulations, &display);
+            for(unsigned int i = 0; i < 2; ++i)
+                update_simulations(&simulations, &display);
         });
     QObject::connect(
         &timer, &QTimer::timeout,
