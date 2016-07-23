@@ -29,6 +29,7 @@ int main(int argc, char ** argv) {
     init_simulations(&simulations, &systems);
     for(auto & x : simulations) {
         x.set_paused(true);
+        x.set_visible(false);
         x.set_update_rate(UPDATE_RATE);
     }
     Display display;

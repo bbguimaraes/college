@@ -57,7 +57,8 @@ void Display::paintGL() {
         glPopMatrix();
     }
     for(auto x : this->m_simulations)
-        this->draw_simulation(x);
+        if(x->visible())
+            this->draw_simulation(x);
     this->update_fps();
     Rendering::draw_hud(this->m_fps);
 }
@@ -172,6 +173,12 @@ void Display::keyPressEvent(QKeyEvent * event) {
         case Qt::Key_Control:
             this->m_ctrl_key_down = true;
             break;
+    }
+    if('0' <= event->key() && event->key() <= '9') {
+        unsigned int i = event->key() - '0';
+        if(i < this->m_simulations.size())
+            this->m_simulations[i]->set_visible(
+                !this->m_simulations[i]->visible());
     }
 }
 
