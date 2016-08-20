@@ -4,6 +4,8 @@ Spring-Mass System
 A library to simulate systems of masses and springs attached to them.  Also
 includes a graphical (opengl) program for testing.
 
+Demo: https://www.youtube.com/watch?v=WB3s7ypA7WQ
+
 
 Building and running
 --------------------
